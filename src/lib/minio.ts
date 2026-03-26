@@ -33,6 +33,14 @@ const minioClient = new Minio.Client({
 
 const BUCKET = process.env.MINIO_BUCKET || 'coe-assets';
 
+const toProxyUrl = (objectKey: string) => {
+  const encodedPath = objectKey
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/');
+  return `/api/storage/${encodedPath}`;
+};
+
 export const initMinio = async () => {
   try {
     const exists = await minioClient.bucketExists(BUCKET);
@@ -55,9 +63,21 @@ export const uploadFile = async (folder: string, file: { buffer: Buffer; origina
 };
 
 export const getSignedUrl = async (objectKey: string, expiry = 3600) => {
+  // When MinIO is HTTP-only, proxy through the app so browsers never request insecure URLs directly.
+  if (!useSSL || process.env.MINIO_USE_PROXY === 'true') {
+    return toProxyUrl(objectKey);
+  }
   return await minioClient.presignedGetObject(BUCKET, objectKey, expiry);
 };
 
 export const deleteFile = async (objectKey: string) => {
   await minioClient.removeObject(BUCKET, objectKey);
+};
+
+export const getObjectStream = async (objectKey: string) => {
+  return await minioClient.getObject(BUCKET, objectKey);
+};
+
+export const getObjectStat = async (objectKey: string) => {
+  return await minioClient.statObject(BUCKET, objectKey);
 };
