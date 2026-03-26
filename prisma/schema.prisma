@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  FACULTY
+  STUDENT
+}
+
+enum UserStatus {
+  ACTIVE
+  PENDING
+  REJECTED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  CANCELLED
+}
+
+enum GrantCategory {
+  GOVT_GRANT
+  SCHOLARSHIP
+  RESEARCH_FUND
+  INDUSTRY_GRANT
+}
+
+enum EventMode {
+  ONLINE
+  OFFLINE
+  HYBRID
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  name       String
+  email      String     @unique
+  phone      String?
+  password   String
+  role       Role
+  uid        String?
+  isVerified Boolean    @default(false)
+  status     UserStatus @default(ACTIVE)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  bookings      Booking[]
+  newsPosts     NewsPost[]
+  grants        Grant[]
+  events        Event[]
+  announcements Announcement[]
+
+  @@map("users")
+}
+
+model Otp {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      String
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@map("otps")
+}
+
+model Booking {
+  id           Int           @id @default(autoincrement())
+  studentId    Int
+  student      User          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  purpose      String        @db.Text
+  date         DateTime
+  timeSlot     String
+  facilities   Json
+  lab          String
+  status       BookingStatus @default(PENDING)
+  adminNote    String?       @db.Text
+  reminderSent Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("bookings")
+}
+
+model NewsPost {
+  id          Int      @id @default(autoincrement())
+  title       String
+  caption     String   @db.Text
+  imageKey    String
+  postedById  Int
+  postedBy    User     @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  publishedAt DateTime @default(now())
+  isVisible   Boolean  @default(true)
+
+  @@map("news_posts")
+}
+
+model Grant {
+  id            Int           @id @default(autoincrement())
+  title         String
+  issuingBody   String
+  category      GrantCategory
+  description   String        @db.Text
+  deadline      DateTime
+  referenceLink String?
+  attachmentKey String?
+  postedById    Int
+  postedBy      User          @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+
+  @@map("grants")
+}
+
+model Event {
+  id               Int       @id @default(autoincrement())
+  title            String
+  description      String    @db.Text
+  date             DateTime
+  mode             EventMode
+  registrationLink String?
+  posterKey        String?
+  postedById       Int
+  postedBy         User      @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  isVisible        Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+
+  @@map("events")
+}
+
+model Announcement {
+  id          Int      @id @default(autoincrement())
+  text        String   @db.Text
+  link        String?
+  expiresAt   DateTime
+  createdById Int
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@map("announcements")
+}

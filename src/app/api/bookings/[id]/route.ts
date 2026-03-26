@@ -1,0 +1,30 @@
+import { NextRequest } from 'next/server';
+import prisma from '@/lib/prisma';
+import { successRes, errorRes, authenticate, authorize } from '@/lib/api-helpers';
+
+// DELETE /api/bookings/[id] — student cancels own pending booking
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const user = authenticate(req);
+    if (!user) return errorRes('Unauthorized', [], 401);
+    if (!authorize(user, 'STUDENT')) return errorRes('Forbidden', [], 403);
+
+    const { id } = await params;
+    const bookingId = parseInt(id);
+
+    const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
+    if (!booking) return errorRes('Booking not found.', [], 404);
+    if (booking.studentId !== user.id) return errorRes('You can only cancel your own bookings.', [], 403);
+    if (booking.status !== 'PENDING') return errorRes('Only pending bookings can be cancelled.', [], 400);
+
+    await prisma.booking.update({
+      where: { id: bookingId },
+      data: { status: 'CANCELLED' },
+    });
+
+    return successRes(null, 'Booking cancelled successfully.');
+  } catch (err) {
+    console.error('Booking cancel error:', err);
+    return errorRes('Internal server error', [], 500);
+  }
+}

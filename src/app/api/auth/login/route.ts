@@ -1,0 +1,75 @@
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
+import { successRes, errorRes } from '@/lib/api-helpers';
+import { loginSchema } from '@/lib/validators';
+import { generateAccessToken, generateRefreshToken, TokenPayload } from '@/lib/jwt';
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const parsed = loginSchema.safeParse(body);
+    if (!parsed.success) {
+      return errorRes('Validation failed', parsed.error.issues.map((e: any) => e.message), 400);
+    }
+
+    const { email, password } = parsed.data;
+
+    const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+    if (!user) {
+      return errorRes('Invalid email or password.', [], 401);
+    }
+
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return errorRes('Invalid email or password.', [], 401);
+    }
+
+    if (user.role === 'STUDENT' && !user.isVerified) {
+      return NextResponse.json(
+        { success: false, message: 'Please verify your email with the OTP.', needsVerification: true },
+        { status: 403 }
+      );
+    }
+
+    // Check status (faculty pending/rejected)
+    if (user.status === 'PENDING') {
+      return errorRes('Your account is pending admin approval.', [], 403);
+    }
+    if (user.status === 'REJECTED') {
+      return errorRes('Your account registration was rejected.', [], 403);
+    }
+
+    const payload: TokenPayload = {
+      id: user.id,
+      role: user.role,
+      name: user.name,
+      email: user.email,
+      ...(user.uid && { uid: user.uid }),
+    };
+
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
+
+    const response = NextResponse.json({
+      success: true,
+      message: 'Login successful.',
+      data: { accessToken, user: { id: user.id, name: user.name, email: user.email, role: user.role, uid: user.uid } },
+    });
+
+    // Set refresh token in httpOnly cookie
+    response.cookies.set('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60,
+      path: '/',
+    });
+
+    return response;
+  } catch (err) {
+    console.error('Login error:', err);
+    return errorRes('Internal server error', [], 500);
+  }
+}

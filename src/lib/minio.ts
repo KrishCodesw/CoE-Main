@@ -1,0 +1,41 @@
+import * as Minio from 'minio';
+import { v4 as uuidv4 } from 'uuid';
+
+const minioClient = new Minio.Client({
+  endPoint: process.env.MINIO_ENDPOINT || 'localhost',
+  port: parseInt(process.env.MINIO_PORT || '9000'),
+  useSSL: process.env.MINIO_USE_SSL === 'true',
+  accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
+  secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+});
+
+const BUCKET = process.env.MINIO_BUCKET || 'coe-assets';
+
+export const initMinio = async () => {
+  try {
+    const exists = await minioClient.bucketExists(BUCKET);
+    if (!exists) {
+      await minioClient.makeBucket(BUCKET);
+      console.log(`[MinIO] Bucket "${BUCKET}" created.`);
+    }
+  } catch (err) {
+    console.error('[MinIO] Init error:', (err as Error).message);
+  }
+};
+
+export const uploadFile = async (folder: string, file: { buffer: Buffer; originalname: string; mimetype: string; size: number }) => {
+  const ext = file.originalname.split('.').pop();
+  const objectKey = `${folder}/${uuidv4()}.${ext}`;
+  await minioClient.putObject(BUCKET, objectKey, file.buffer, file.size, {
+    'Content-Type': file.mimetype,
+  });
+  return objectKey;
+};
+
+export const getSignedUrl = async (objectKey: string, expiry = 3600) => {
+  return await minioClient.presignedGetObject(BUCKET, objectKey, expiry);
+};
+
+export const deleteFile = async (objectKey: string) => {
+  await minioClient.removeObject(BUCKET, objectKey);
+};
