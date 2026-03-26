@@ -138,46 +138,87 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* Laboratory Preview */}
+          {/* News & Press Section */}
           <section className="mb-16">
-            <div className="border-l-4 border-[#002155] pl-6 mb-8">
-              <h2 className="font-headline text-3xl text-[#002155] tracking-tight">Specialized Facilities</h2>
+            <div className="border-l-4 border-[#002155] pl-6 mb-8 flex justify-between items-end">
+              <div>
+                <h2 className="font-headline text-3xl text-[#002155] tracking-tight">In the Press</h2>
+                <p className="text-xs font-['Inter'] uppercase tracking-widest text-[#8c4f00] mt-1">Institutional News & Media</p>
+              </div>
+              <button className="text-xs font-['Inter'] font-bold text-[#002155] uppercase tracking-widest hover:text-[#8c4f00] transition-colors">
+                View All News →
+              </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
-              <div className="relative aspect-square group overflow-hidden bg-[#002155]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-500"
-                  alt="Macro shot of intricate gold-plated computer circuit boards and electronic micro-components"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCM8sj0cGrKWXDKR4SaEvCC2TGmuSDZ-7AlYTh06Bsmbo5_Or2TcdP_HADkh4mlALdX6-AY41FwOdmzvWFUyxsT6K0lv9HQ80hTjjMsfTtg8iCcEyevtoovuyLi5WT2hOZtqPl5W0c7eZ5RSJeyI3-YifQK9O0qPKGBWn_cyRIW4kBIjNRIDJasTOUkAEv7vlt2Puyq3QbCNw8nfMV-ftN_o0vK_ZDtHUdEriTL4ti_Yyn5rqkOMFy3o9RxkR5DBae-I9kfs8iKDrI"
-                />
-                <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-                  <span className="text-[10px] font-['Inter'] tracking-widest uppercase opacity-70">Facility 01</span>
-                  <h3 className="font-headline text-lg">Embedded IoT Lab</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* News Item 1 */}
+              <div className="border border-[#c4c6d3] bg-white group cursor-pointer hover:shadow-lg transition-all duration-300">
+                <div className="w-full h-48 bg-[#efeeea] overflow-hidden relative border-b border-[#c4c6d3]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                    alt="Newspaper cutout showing TCET CoE inauguration"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJnWnqCv8p7bInxWAXwpxuomZMAxs08GDwZdj8jhmPagckgZ7rC_fSo4FnqW_n5HQN1eRHF51_yHL9oRYZp0OGzqxSjn7T5ICVOFdrRkpLtb41YJJ3Q9XYmbhRZz_vJpLm3X1kt-Do-Wur4ciDK1WN55Ybhgz_wI2G6ioqfbQKt4I0z7wHJ9K1iHbkBEvZEuZL8YjqS9Z_k9nPDyMVgJgNJ5DlTjdIg2EF4FJAQf5rgVBuugmgeeUdKQ0RSG2vXzyzZ2BlOVMA3xo" 
+                  />
+                  <div className="absolute top-4 left-4 bg-[#002155] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1">
+                    Oct 24, 2024
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="font-['Inter'] text-[10px] uppercase tracking-widest text-[#8c4f00] mb-2">The Times of India</p>
+                  <h3 className="font-body font-semibold text-[#002155] mb-3 leading-tight group-hover:text-[#8c4f00] transition-colors">
+                    TCET Inaugurates Advanced AI Computing Center of Excellence
+                  </h3>
+                  <p className="text-sm text-[#434651] font-body line-clamp-2">
+                    Highlighting the institution's commitment to cutting edge research with the introduction of new lab facilities...
+                  </p>
                 </div>
               </div>
-              <div className="relative aspect-square group overflow-hidden bg-[#002155]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-500"
-                  alt="Server room with rows of blue LED-lit server racks and organized networking cables"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuB25dR0W2nSUOOnS6wtwndvoGuD10s4kJ-A1ColdkGM40J3DjYh9ltxVz6T_l3G8uamzT5XIUX181Y6YOYslXIZLlg_IEXnv0c1Q1_fPPOnhlGJd4mVrVxbxEEc1gg0_gqrXRj3pNdRgqPZgdXGjONcMv7wPIz3LL9PTTkzdOWfnN2XmJOtwSlgfv59YVAtIx1JTcmnhvdNoabhJpEPmZUB8F8-9i18C9VPr0_TBlzGrtrw9duekF5Wvb8Bcu0XjblHsfeUFBd_eso"
-                />
-                <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-                  <span className="text-[10px] font-['Inter'] tracking-widest uppercase opacity-70">Facility 02</span>
-                  <h3 className="font-headline text-lg">Data Science Hub</h3>
+
+              {/* News Item 2 */}
+              <div className="border border-[#c4c6d3] bg-white group cursor-pointer hover:shadow-lg transition-all duration-300">
+                <div className="w-full h-48 bg-[#efeeea] overflow-hidden relative border-b border-[#c4c6d3]">
+                   {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                    alt="Newspaper cutout about research grant"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhoT1SdZZYyvVB7pZ01EbLd_ybTFnomxautcchnI1YaNhLR3ATcfvIk9rV_S0DzDLTYVJBfS3q_AtaAQPzCdMRt2iMks5Pf9nld3T9Tna1dEs5FIs4LAmEbSWN31CXyxxrUWvLPbOpjmdr6TDlSAZ5mKLdocKNhqmUPm1bGP74NgLeT4KtcwxTEv3ca8TB9dwOGrGyx0vxHtR4n7DIZCp1yxPtq4ssjOdaSI2uQrJIUQRk36efMx5tLkd-E-JDOOKl1iRW5wZuw-M"
+                  />
+                  <div className="absolute top-4 left-4 bg-[#002155] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1">
+                    Sep 12, 2024
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="font-['Inter'] text-[10px] uppercase tracking-widest text-[#8c4f00] mb-2">Education Times</p>
+                  <h3 className="font-body font-semibold text-[#002155] mb-3 leading-tight group-hover:text-[#8c4f00] transition-colors">
+                    Government Awards Massive Research Grant to TCET Handlers
+                  </h3>
+                  <p className="text-sm text-[#434651] font-body line-clamp-2">
+                    Research scholars at TCET recognized for their immense contribution to VLSI domain research...
+                  </p>
                 </div>
               </div>
-              <div className="relative aspect-square group overflow-hidden bg-[#002155]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-500"
-                  alt="Mechanical engineering student using a digital caliper to measure a 3D-printed industrial component"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsJdTk6IiPYG6hv1WXyMzpXzd4DBu_atVSCpybeossWaz9pYIsdWOo0JO4noPOJhBS7d83CEd5kudzcRxnXSzhIbICTTpJFbGYMvD8I3waIq3d_LJpM_9ZHYHJ2qr2smzVs2TpH0UphWf6oXMsPZheK_s2HmhdwI6VC71X_Nr7oXmb6kFKL7gH02JNK8AB61tKlj9yTuMw53g-SIH4lFJDJHww3b9t7jRA0qgLGWEnzFY0Re1G5eLpPuDOroQfC5GOQ5sTrHTPl2U"
-                />
-                <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-                  <span className="text-[10px] font-['Inter'] tracking-widest uppercase opacity-70">Facility 03</span>
-                  <h3 className="font-headline text-lg">Precision Fab Lab</h3>
+
+              {/* News Item 3 */}
+              <div className="border border-[#c4c6d3] bg-white group cursor-pointer hover:shadow-lg transition-all duration-300">
+                <div className="w-full h-48 bg-[#efeeea] overflow-hidden relative border-b border-[#c4c6d3]">
+                   {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                    alt="Newspaper cutout of robotics lab"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCM8sj0cGrKWXDKR4SaEvCC2TGmuSDZ-7AlYTh06Bsmbo5_Or2TcdP_HADkh4mlALdX6-AY41FwOdmzvWFUyxsT6K0lv9HQ80hTjjMsfTtg8iCcEyevtoovuyLi5WT2hOZtqPl5W0c7eZ5RSJeyI3-YifQK9O0qPKGBWn_cyRIW4kBIjNRIDJasTOUkAEv7vlt2Puyq3QbCNw8nfMV-ftN_o0vK_ZDtHUdEriTL4ti_Yyn5rqkOMFy3o9RxkR5DBae-I9kfs8iKDrI"
+                  />
+                  <div className="absolute top-4 left-4 bg-[#002155] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1">
+                    Aug 05, 2024
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="font-['Inter'] text-[10px] uppercase tracking-widest text-[#8c4f00] mb-2">Hindustan Times</p>
+                  <h3 className="font-body font-semibold text-[#002155] mb-3 leading-tight group-hover:text-[#8c4f00] transition-colors">
+                    Robotics Automation Hub Promises Next-Generation Breakthroughs
+                  </h3>
+                  <p className="text-sm text-[#434651] font-body line-clamp-2">
+                    The newly set up IoT and Automation Lab at the institute becomes the centerpiece for hardware prototyping...
+                  </p>
                 </div>
               </div>
             </div>
