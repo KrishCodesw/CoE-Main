@@ -36,33 +36,34 @@ function formatDate(dateInput: Date | string) {
 export default async function HomePage() {
   const now = new Date();
 
-  const [heroSlidesRaw, newsRaw, events, grants, announcements] = await Promise.all([
-    prisma.heroSlide.findMany({
-      where: { isActive: true },
-      orderBy: { createdAt: "desc" },
-      take: 6,
-    }),
-    prisma.newsPost.findMany({
-      where: { isVisible: true },
-      orderBy: { publishedAt: "desc" },
-      take: 6,
-    }),
-    prisma.event.findMany({
-      where: { isVisible: true, date: { gte: now } },
-      orderBy: { date: "asc" },
-      take: 6,
-    }),
-    prisma.grant.findMany({
-      where: { isActive: true },
-      orderBy: { deadline: "asc" },
-      take: 8,
-    }),
-    prisma.announcement.findMany({
-      where: { expiresAt: { gt: now } },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-    }),
-  ]);
+  const [heroSlidesRaw, newsRaw, events, grants, announcements] =
+    await Promise.all([
+      prisma.heroSlide.findMany({
+        where: { isActive: true },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+      }),
+      prisma.newsPost.findMany({
+        where: { isVisible: true },
+        orderBy: { publishedAt: "desc" },
+        take: 6,
+      }),
+      prisma.event.findMany({
+        where: { isVisible: true, date: { gte: now } },
+        orderBy: { date: "asc" },
+        take: 6,
+      }),
+      prisma.grant.findMany({
+        where: { isActive: true },
+        orderBy: { deadline: "asc" },
+        take: 8,
+      }),
+      prisma.announcement.findMany({
+        where: { expiresAt: { gt: now } },
+        orderBy: { createdAt: "desc" },
+        take: 8,
+      }),
+    ]);
 
   const news: HomeNews[] = await Promise.all(
     newsRaw.map(async (item) => ({
@@ -76,13 +77,6 @@ export default async function HomePage() {
       ...item,
       imageUrl: await getSignedUrl(item.imageKey).catch(() => null),
     })),
-  );
-
-  const heroSlidesDb: HeroSlideRecord[] = await Promise.all(
-    heroSlidesRaw.map(async (item) => ({
-      ...item,
-      imageUrl: await getSignedUrl(item.imageKey).catch(() => null),
-    }))
   );
 
   const heroSlides: HeroSlide[] =
@@ -116,60 +110,50 @@ export default async function HomePage() {
       <div className="col-span-12 md:col-span-9 lg:col-span-9 p-3 sm:p-4 md:p-8 lg:p-12 bg-[#fffefc] md:bg-white md:border-x border-[#d8dae6] md:shadow-[0_0_0_1px_rgba(0,33,85,0.03)]">
         <HeroCarousel slides={heroSlides} intervalMs={4000} />
 
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-10 md:mb-12 border-y border-[#c4c6d3] py-6 md:py-8">
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-10 md:mb-12 border-y border-[#c4c6d3] py-6 md:py-8 mt-12">
           <div>
-            <div className="text-[#002155] font-headline text-3xl font-bold">
+            <div className="text-[#002155] font-headline text-2xl sm:text-3xl font-bold">
               {news.length}
             </div>
             <div className="text-xs uppercase tracking-widest text-[#747782]">
               Published News
             </div>
-            <div className="text-[#002155] font-headline text-2xl sm:text-3xl font-bold">{news.length}</div>
-            <div className="text-xs uppercase tracking-widest text-[#747782]">Published News</div>
           </div>
           <div>
-            <div className="text-[#002155] font-headline text-3xl font-bold">
+            <div className="text-[#002155] font-headline text-2xl sm:text-3xl font-bold">
               {events.length}
             </div>
             <div className="text-xs uppercase tracking-widest text-[#747782]">
               Upcoming Events
             </div>
-            <div className="text-[#002155] font-headline text-2xl sm:text-3xl font-bold">{events.length}</div>
-            <div className="text-xs uppercase tracking-widest text-[#747782]">Upcoming Events</div>
           </div>
           <div>
-            <div className="text-[#002155] font-headline text-3xl font-bold">
+            <div className="text-[#002155] font-headline text-2xl sm:text-3xl font-bold">
               {grants.length}
             </div>
             <div className="text-xs uppercase tracking-widest text-[#747782]">
               Active Grants
             </div>
-            <div className="text-[#002155] font-headline text-2xl sm:text-3xl font-bold">{grants.length}</div>
-            <div className="text-xs uppercase tracking-widest text-[#747782]">Active Grants</div>
           </div>
           <div>
-            <div className="text-[#002155] font-headline text-3xl font-bold">
+            <div className="text-[#002155] font-headline text-2xl sm:text-3xl font-bold">
               {announcements.length}
             </div>
             <div className="text-xs uppercase tracking-widest text-[#747782]">
               Live Circulars
             </div>
-            <div className="text-[#002155] font-headline text-2xl sm:text-3xl font-bold">{announcements.length}</div>
-            <div className="text-xs uppercase tracking-widest text-[#747782]">Live Circulars</div>
           </div>
         </section>
 
         <section className="mb-14">
           <div className="border-l-4 border-[#002155] pl-4 md:pl-6 mb-6 flex justify-between items-end">
             <div>
-              <h2 className="font-headline text-3xl text-[#002155] tracking-tight">
+              <h2 className="font-headline text-2xl sm:text-3xl text-[#002155] tracking-tight">
                 In the Press
               </h2>
               <p className="text-xs uppercase tracking-widest text-[#8c4f00] mt-1">
                 Live from GET /api/news
               </p>
-              <h2 className="font-headline text-2xl sm:text-3xl text-[#002155] tracking-tight">In the Press</h2>
-              <p className="text-xs uppercase tracking-widest text-[#8c4f00] mt-1">Live from GET /api/news</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -185,14 +169,12 @@ export default async function HomePage() {
 
         <section className="mb-14">
           <div className="border-l-4 border-[#002155] pl-4 md:pl-6 mb-6">
-            <h2 className="text-3xl font-headline tracking-tight text-[#002155]">
+            <h2 className="text-2xl sm:text-3xl font-headline tracking-tight text-[#002155]">
               Current Grant Opportunities
             </h2>
             <p className="text-sm text-[#747782] uppercase tracking-widest mt-1">
               Live from GET /api/grants
             </p>
-            <h2 className="text-2xl sm:text-3xl font-headline tracking-tight text-[#002155]">Current Grant Opportunities</h2>
-            <p className="text-sm text-[#747782] uppercase tracking-widest mt-1">Live from GET /api/grants</p>
           </div>
           <div className="overflow-x-auto border border-[#c4c6d3] bg-white">
             <table className="w-full min-w-[760px] border-collapse">
@@ -208,10 +190,9 @@ export default async function HomePage() {
               <tbody className="text-sm">
                 {grants.length === 0 ? (
                   <tr>
-                    <td className="p-4 text-[#434651]" colSpan={5}>
+                    <td className="p-3 md:p-4 text-[#434651]" colSpan={5}>
                       No active grants found.
                     </td>
-                    <td className="p-3 md:p-4 text-[#434651]" colSpan={5}>No active grants found.</td>
                   </tr>
                 ) : (
                   grants.map((grant, index) => (
@@ -219,20 +200,16 @@ export default async function HomePage() {
                       key={grant.id}
                       className={`${index % 2 === 0 ? "bg-[#f5f4f0]" : "bg-white"} border-t border-[#c4c6d3]`}
                     >
-                      <td className="p-4 font-semibold text-[#002155]">
+                      <td className="p-3 md:p-4 font-semibold text-[#002155]">
                         {grant.issuingBody}
                       </td>
-                      <td className="p-4">{grant.title}</td>
-                      <td className="p-4">
+                      <td className="p-3 md:p-4">{grant.title}</td>
+                      <td className="p-3 md:p-4">
                         {grant.category.replaceAll("_", " ")}
                       </td>
-                      <td className="p-4">{formatDate(grant.deadline)}</td>
-                      <td className="p-4">
-                    <tr key={grant.id} className={`${index % 2 === 0 ? "bg-[#f5f4f0]" : "bg-white"} border-t border-[#c4c6d3]`}>
-                      <td className="p-3 md:p-4 font-semibold text-[#002155]">{grant.issuingBody}</td>
-                      <td className="p-3 md:p-4">{grant.title}</td>
-                      <td className="p-3 md:p-4">{grant.category.replaceAll("_", " ")}</td>
-                      <td className="p-3 md:p-4">{formatDate(grant.deadline)}</td>
+                      <td className="p-3 md:p-4">
+                        {formatDate(grant.deadline)}
+                      </td>
                       <td className="p-3 md:p-4">
                         {grant.referenceLink ? (
                           <a
@@ -257,14 +234,12 @@ export default async function HomePage() {
 
         <section className="mb-10">
           <div className="border-l-4 border-[#002155] pl-4 md:pl-6 mb-6">
-            <h2 className="text-3xl font-headline tracking-tight text-[#002155]">
+            <h2 className="text-2xl sm:text-3xl font-headline tracking-tight text-[#002155]">
               Upcoming Events
             </h2>
             <p className="text-sm text-[#747782] uppercase tracking-widest mt-1">
               Live from GET /api/events
             </p>
-            <h2 className="text-2xl sm:text-3xl font-headline tracking-tight text-[#002155]">Upcoming Events</h2>
-            <p className="text-sm text-[#747782] uppercase tracking-widest mt-1">Live from GET /api/events</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {events.length === 0 ? (
