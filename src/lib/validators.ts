@@ -58,6 +58,11 @@ export const newsCreateSchema = z.object({
   caption: z.string().min(2),
 });
 
+export const heroSlideCreateSchema = z.object({
+  title: z.string().min(2),
+  caption: z.string().min(2),
+});
+
 export const newsUpdateSchema = z.object({
   title: z.string().min(2).optional(),
   caption: z.string().min(2).optional(),

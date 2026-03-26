@@ -44,12 +44,21 @@ type Stats = {
   newsCount: number;
 };
 
+type HeroSlide = {
+  id: number;
+  title: string;
+  caption: string;
+  imageUrl: string | null;
+  createdAt: string;
+};
+
 type AdminPanelClientProps = {
   stats: Stats;
   pendingBookings: Booking[];
   upcomingConfirmedBookings: Booking[];
   pendingFaculty: FacultyUser[];
   users: FacultyUser[];
+  heroSlides: HeroSlide[];
 };
 
 const apiCall = async (url: string, options?: RequestInit) => {
@@ -75,6 +84,7 @@ export default function AdminPanelClient({
   upcomingConfirmedBookings,
   pendingFaculty,
   users,
+  heroSlides,
 }: AdminPanelClientProps) {
   const router = useRouter();
 
@@ -82,6 +92,10 @@ export default function AdminPanelClient({
   const [busyFacultyId, setBusyFacultyId] = useState<number | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [heroTitle, setHeroTitle] = useState("");
+  const [heroCaption, setHeroCaption] = useState("");
+  const [heroImage, setHeroImage] = useState<File | null>(null);
+  const [heroUploading, setHeroUploading] = useState(false);
 
   const recentUsers = useMemo(() => users.slice(0, 12), [users]);
   const prepBookings = useMemo(() => {
@@ -164,6 +178,46 @@ export default function AdminPanelClient({
     }
   };
 
+  const handleHeroUpload = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!heroImage) {
+      setErrorMessage("Please select an image for the hero slide.");
+      return;
+    }
+
+    try {
+      setErrorMessage("");
+      setStatusMessage("");
+      setHeroUploading(true);
+
+      const formData = new FormData();
+      formData.set("title", heroTitle);
+      formData.set("caption", heroCaption);
+      formData.set("image", heroImage);
+
+      const res = await fetch("/api/hero-slides", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(payload?.message || "Could not upload hero slide.");
+      }
+
+      setHeroTitle("");
+      setHeroCaption("");
+      setHeroImage(null);
+      setStatusMessage("Hero slide uploaded successfully.");
+      router.refresh();
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : "Could not upload hero slide.");
+    } finally {
+      setHeroUploading(false);
+    }
+  };
+
   return (
     <main className="max-w-7xl mx-auto px-4 md:px-8 pt-[120px] pb-14 min-h-screen">
       <header className="mb-8 border-l-4 border-[#002155] pl-4 md:pl-6">
@@ -210,6 +264,83 @@ export default function AdminPanelClient({
         <div className="border border-[#c4c6d3] bg-white p-5">
           <p className="text-xs uppercase tracking-widest text-[#434651] font-label">Visible News Posts</p>
           <p className="mt-2 text-3xl font-bold text-[#002155]">{stats.newsCount}</p>
+        </div>
+      </section>
+
+      <section className="mb-10 grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="border border-[#c4c6d3] bg-white p-5">
+          <h2 className="font-headline text-2xl text-[#002155] mb-4">Homepage Hero Upload</h2>
+          <p className="text-sm text-[#434651] mb-4">
+            Upload slides for the home hero carousel (title, caption, image).
+          </p>
+
+          <form className="space-y-4" onSubmit={handleHeroUpload}>
+            <div>
+              <label className="block text-xs uppercase tracking-widest text-[#434651] font-label mb-2">Title</label>
+              <input
+                value={heroTitle}
+                onChange={(e) => setHeroTitle(e.target.value)}
+                required
+                className="w-full border border-[#c4c6d3] px-3 py-2 text-sm"
+                placeholder="Slide title"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase tracking-widest text-[#434651] font-label mb-2">Caption</label>
+              <textarea
+                value={heroCaption}
+                onChange={(e) => setHeroCaption(e.target.value)}
+                required
+                className="w-full border border-[#c4c6d3] px-3 py-2 text-sm min-h-[100px]"
+                placeholder="Slide caption"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase tracking-widest text-[#434651] font-label mb-2">Image</label>
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                required
+                onChange={(e) => setHeroImage(e.target.files?.[0] ?? null)}
+                className="w-full text-sm"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={heroUploading}
+              className="bg-[#002155] text-white px-5 py-2 text-xs font-bold uppercase tracking-wider disabled:opacity-60"
+            >
+              {heroUploading ? "Uploading..." : "Upload Hero Slide"}
+            </button>
+          </form>
+        </div>
+
+        <div className="border border-[#c4c6d3] bg-white p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-headline text-2xl text-[#002155]">Recent Hero Slides</h2>
+            <span className="text-xs uppercase tracking-widest text-[#434651] font-label">{heroSlides.length} total</span>
+          </div>
+
+          {heroSlides.length === 0 ? (
+            <p className="text-sm text-[#434651] border border-dashed border-[#c4c6d3] p-4">
+              No hero slides uploaded yet.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {heroSlides.slice(0, 5).map((slide) => (
+                <article key={slide.id} className="border border-[#e3e2df] p-3 bg-[#faf9f5]">
+                  <p className="text-sm font-bold text-[#002155]">{slide.title}</p>
+                  <p className="text-xs text-[#434651] mt-1 line-clamp-2">{slide.caption}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-[#747782] mt-2">
+                    {new Date(slide.createdAt).toLocaleString()}
+                  </p>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

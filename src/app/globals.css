@@ -62,6 +62,11 @@
   --radius-sm: 0px;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
@@ -80,6 +85,9 @@
   gap: 2rem;
   min-width: 100%;
   animation: scroll 30s linear infinite;
+}
+.marquee-content span {
+  white-space: nowrap;
 }
 @keyframes scroll {
   from { transform: translateX(0); }
@@ -111,3 +119,14 @@
 
 /* Active tab */
 .active-tab { background-color: #002155; color: #ffffff; }
+
+@media (max-width: 640px) {
+  .marquee-scroll {
+    gap: 1rem;
+  }
+
+  .marquee-content {
+    gap: 1.25rem;
+    animation-duration: 24s;
+  }
+}

@@ -146,3 +146,15 @@ model Announcement {
 
   @@map("announcements")
 }
+
+model HeroSlide {
+  id        Int      @id @default(autoincrement())
+  title     String
+  caption   String   @db.Text
+  imageKey  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("hero_slides")
+}

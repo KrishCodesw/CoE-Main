@@ -23,7 +23,7 @@ export default function Navbar() {
   return (
     <>
       {/* TopNoticeTicker */}
-      <div className="bg-[#fd9923] flex items-center px-4 md:px-6 py-2 w-full z-[60] fixed top-0 border-none font-['Inter'] text-xs font-bold uppercase tracking-wider text-white marquee-scroll cursor-pointer">
+      <div className="bg-[#fd9923] flex items-center px-3 sm:px-4 md:px-6 h-9 w-full z-[60] fixed top-0 border-none font-['Inter'] text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white marquee-scroll cursor-pointer">
         <span className="whitespace-nowrap flex items-center gap-2">
         </span>
         <div className="marquee-content ml-2 sm:ml-4">
@@ -34,12 +34,12 @@ export default function Navbar() {
       </div>
 
       {/* TopNavBar */}
-      <nav className="bg-[#002155] flex justify-between items-center w-full px-4 md:px-8 py-4 z-50 fixed top-[32px] sm:top-[32px] border-none shadow-md">
+      <nav className="bg-[#002155] flex justify-between items-center w-full px-3 sm:px-4 md:px-8 h-16 z-50 fixed top-9 border-none shadow-md">
         <div className="flex items-center gap-3 md:gap-4 z-50">
           <div className="w-8 h-8 md:w-10 md:h-10 bg-white flex items-center justify-center shrink-0">
             <span className="text-[#002155] font-black text-lg md:text-xl">TC</span>
           </div>
-          <Link href="/" className="text-lg md:text-xl font-bold text-white tracking-tighter uppercase flex flex-col leading-tight cursor-pointer">
+          <Link href="/" className="text-base sm:text-lg md:text-xl font-bold text-white tracking-tighter uppercase flex flex-col leading-tight cursor-pointer">
             <span className="font-headline italic">TCET CoE</span>
             <span className="text-[9px] md:text-[10px] tracking-widest font-label opacity-80 hidden sm:block">Center of Excellence</span>
           </Link>
@@ -90,8 +90,8 @@ export default function Navbar() {
       </nav>
 
       {/* Mobile Menu Overlay */}
-      <div 
-        className={`fixed inset-0 bg-[#002155] z-40 lg:hidden flex flex-col pt-24 px-6 transition-transform duration-300 ease-in-out ${
+      <div
+        className={`fixed inset-0 bg-[#002155] z-40 lg:hidden flex flex-col pt-28 px-5 sm:px-6 transition-transform duration-300 ease-in-out ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >

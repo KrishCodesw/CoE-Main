@@ -50,6 +50,17 @@ type Stats = {
   newsCount: number;
 };
 
+type HeroSlide = {
+  id: number;
+  title: string;
+  caption: string;
+  imageKey: string;
+  imageUrl: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 async function fetchAdmin<T>(path: string, token: string): Promise<T> {
@@ -127,12 +138,13 @@ export default async function AdminPage() {
   }
 
   try {
-    const [stats, pendingBookings, upcomingConfirmedBookings, pendingFaculty, users] = await Promise.all([
+    const [stats, pendingBookings, upcomingConfirmedBookings, pendingFaculty, users, heroSlides] = await Promise.all([
       fetchAdmin<Stats>("/api/admin/stats", token),
       fetchAdmin<Booking[]>("/api/admin/bookings?status=PENDING", token),
       fetchAdmin<Booking[]>("/api/admin/bookings?status=CONFIRMED", token),
       fetchAdmin<AdminUser[]>("/api/admin/users?role=FACULTY&status=PENDING", token),
       fetchAdmin<AdminUser[]>("/api/admin/users", token),
+      fetchAdmin<HeroSlide[]>("/api/hero-slides", token),
     ]);
 
     return (
@@ -142,6 +154,7 @@ export default async function AdminPage() {
         upcomingConfirmedBookings={upcomingConfirmedBookings}
         pendingFaculty={pendingFaculty}
         users={users}
+        heroSlides={heroSlides}
       />
     );
   } catch (err) {
