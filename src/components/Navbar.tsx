@@ -16,6 +16,7 @@ export default function Navbar() {
     { label: "Events", href: "#" },
     { label: "Grants", href: "#" },
     { label: "News", href: "#" },
+    { label: "Login", href: "/login" },
   ];
 
   return (

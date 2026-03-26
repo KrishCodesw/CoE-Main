@@ -45,21 +45,20 @@ type Stats = {
 };
 
 type AdminPanelClientProps = {
-  token: string;
   stats: Stats;
   pendingBookings: Booking[];
   pendingFaculty: FacultyUser[];
   users: FacultyUser[];
 };
 
-const apiCall = async (url: string, token: string, options?: RequestInit) => {
+const apiCall = async (url: string, options?: RequestInit) => {
   const res = await fetch(url, {
     ...options,
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
       ...(options?.headers ?? {}),
     },
+    credentials: "include",
   });
 
   const payload = await res.json().catch(() => ({}));
@@ -70,7 +69,6 @@ const apiCall = async (url: string, token: string, options?: RequestInit) => {
 };
 
 export default function AdminPanelClient({
-  token,
   stats,
   pendingBookings,
   pendingFaculty,
@@ -90,7 +88,7 @@ export default function AdminPanelClient({
       setErrorMessage("");
       setStatusMessage("");
       setBusyBookingId(id);
-      await apiCall(`/api/admin/bookings/${id}/confirm`, token, { method: "PATCH" });
+      await apiCall(`/api/admin/bookings/${id}/confirm`, { method: "PATCH" });
       setStatusMessage(`Booking #${id} confirmed.`);
       router.refresh();
     } catch (err) {
@@ -107,7 +105,7 @@ export default function AdminPanelClient({
       setErrorMessage("");
       setStatusMessage("");
       setBusyBookingId(id);
-      await apiCall(`/api/admin/bookings/${id}/reject`, token, {
+      await apiCall(`/api/admin/bookings/${id}/reject`, {
         method: "PATCH",
         body: JSON.stringify({ adminNote }),
       });
@@ -125,7 +123,7 @@ export default function AdminPanelClient({
       setErrorMessage("");
       setStatusMessage("");
       setBusyFacultyId(id);
-      await apiCall(`/api/admin/faculty/${id}/approve`, token, { method: "PATCH" });
+      await apiCall(`/api/admin/faculty/${id}/approve`, { method: "PATCH" });
       setStatusMessage(`Faculty user #${id} approved.`);
       router.refresh();
     } catch (err) {
@@ -140,7 +138,7 @@ export default function AdminPanelClient({
       setErrorMessage("");
       setStatusMessage("");
       setBusyFacultyId(id);
-      await apiCall(`/api/admin/faculty/${id}/reject`, token, { method: "PATCH" });
+      await apiCall(`/api/admin/faculty/${id}/reject`, { method: "PATCH" });
       setStatusMessage(`Faculty user #${id} rejected.`);
       router.refresh();
     } catch (err) {

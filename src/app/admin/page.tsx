@@ -1,4 +1,7 @@
+import Link from "next/link";
+import { cookies } from "next/headers";
 import AdminPanelClient from "./AdminPanelClient";
+import { verifyAccessToken } from "@/lib/jwt";
 
 type AdminApiResponse<T> = {
   success: boolean;
@@ -66,50 +69,63 @@ async function fetchAdmin<T>(path: string, token: string): Promise<T> {
   return payload.data;
 }
 
-function getAdminTokenFromCookies(): string | null {
-  if (typeof document === "undefined") return null;
-  const token = document.cookie
-    .split("; ")
-    .find((entry) => entry.startsWith("admin_access_token="))
-    ?.split("=")[1];
-  return token ? decodeURIComponent(token) : null;
-}
-
-export default async function AdminPage() {
-  // This app currently stores the access token client-side after login.
-  // To reuse the same auth mechanism on /admin, we read the token in client code.
-  // Server rendering still provides the page shell; data fetch happens only with token.
+function AdminMessage({ title, body, actionLabel, actionHref }: { title: string; body: string; actionLabel?: string; actionHref?: string }) {
   return (
-    <AdminBootstrap />
+    <main className="max-w-3xl mx-auto px-4 md:px-8 pt-[120px] pb-12 min-h-screen">
+      <div className="border border-[#c4c6d3] bg-white p-6 md:p-8">
+        <h1 className="font-headline text-3xl text-[#002155]">{title}</h1>
+        <p className="mt-3 text-[#434651]">{body}</p>
+        {actionLabel && actionHref ? (
+          <Link
+            href={actionHref}
+            className="inline-flex mt-6 bg-[#002155] text-white px-5 py-3 text-xs font-bold uppercase tracking-widest"
+          >
+            {actionLabel}
+          </Link>
+        ) : null}
+      </div>
+    </main>
   );
 }
 
-function AdminBootstrap() {
-  const token = getAdminTokenFromCookies();
+export default async function AdminPage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("accessToken")?.value;
 
   if (!token) {
     return (
-      <main className="max-w-3xl mx-auto px-4 md:px-8 pt-[120px] pb-12 min-h-screen">
-        <div className="border border-[#c4c6d3] bg-white p-6 md:p-8">
-          <h1 className="font-headline text-3xl text-[#002155]">Admin Access Required</h1>
-          <p className="mt-3 text-[#434651]">
-            Please login first, then set an access token cookie named <strong>admin_access_token</strong>.
-          </p>
-          <p className="mt-2 text-sm text-[#434651]">
-            Example in browser console after admin login:
-          </p>
-          <pre className="mt-2 text-xs bg-[#f5f4f0] p-3 border border-[#e3e2df] overflow-x-auto">
-{`document.cookie = "admin_access_token=" + encodeURIComponent(localStorage.getItem("accessToken") || "") + "; path=/";`}
-          </pre>
-        </div>
-      </main>
+      <AdminMessage
+        title="Admin Access Required"
+        body="Please login with an admin account to continue."
+        actionLabel="Go to Login"
+        actionHref="/login"
+      />
     );
   }
 
-  return <AdminDataLoader token={token} />;
-}
+  try {
+    const payload = verifyAccessToken(token);
+    if (payload.role !== "ADMIN") {
+      return (
+        <AdminMessage
+          title="Insufficient Permissions"
+          body="Your account does not have admin access."
+          actionLabel="Go to Login"
+          actionHref="/login"
+        />
+      );
+    }
+  } catch {
+    return (
+      <AdminMessage
+        title="Session Expired"
+        body="Your session has expired. Please login again."
+        actionLabel="Go to Login"
+        actionHref="/login"
+      />
+    );
+  }
 
-async function AdminDataLoader({ token }: { token: string }) {
   try {
     const [stats, pendingBookings, pendingFaculty, users] = await Promise.all([
       fetchAdmin<Stats>("/api/admin/stats", token),
@@ -120,7 +136,6 @@ async function AdminDataLoader({ token }: { token: string }) {
 
     return (
       <AdminPanelClient
-        token={token}
         stats={stats}
         pendingBookings={pendingBookings}
         pendingFaculty={pendingFaculty}

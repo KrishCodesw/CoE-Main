@@ -19,7 +19,6 @@ export default function FacilityBookingPage() {
   const [authError, setAuthError] = useState("");
   const [authSuccess, setAuthSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState("");
 
   // Form State
   const [purpose, setPurpose] = useState("");
@@ -32,17 +31,34 @@ export default function FacilityBookingPage() {
   const [bookingRef, setBookingRef] = useState("");
   
   const availableLabs = [
-    "Advanced VLSI Lab",
-    "HPC Cluster Node",
-    "Precision Fab Lab",
-    "Data Science Hub"
+    "Research Culture Development Room 701",
+    "Industrial IoT & OT Room 213",
+    "Robotics & Automation Room 010",
   ];
-  const availableEquipment = [
-    "NVIDIA DGX-A100",
-    "Digital Oscilloscope",
-    "Ultimaker S5 Pro",
-    "Logic Analyzer"
-  ];
+
+  const labEquipmentMap: Record<string, string[]> = {
+    "Research Culture Development Room 701": [
+      "Workstation",
+      "Computer",
+      "Deployable server",
+      "AI computing server",
+      "Projector & whiteboard",
+    ],
+    "Industrial IoT & OT Room 213": [
+      "PLC training rack (mock)",
+      "IoT sensor bench (mock)",
+      "Edge gateway demo kit (mock)",
+      "SCADA simulator (mock)",
+    ],
+    "Robotics & Automation Room 010": [
+      "6-axis robot demo cell (mock)",
+      "Conveyor automation rig (mock)",
+      "Vision inspection station (mock)",
+      "Safety light curtain (mock)",
+    ],
+  };
+
+  const availableEquipment = lab ? labEquipmentMap[lab] ?? [] : [];
   const timeSlots = ["09:00 - 11:00", "11:00 - 13:00", "13:00 - 15:00", "15:00 - 17:00", "17:00 - 19:00"];
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -53,7 +69,8 @@ export default function FacilityBookingPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) {
@@ -74,9 +91,6 @@ export default function FacilityBookingPage() {
       }
       
       // Successfully logged in (Cookie is set), skip to booking
-      if (data.data?.accessToken) {
-        setToken(data.data.accessToken);
-      }
       setStep(3);
     } catch (err: any) {
       setAuthError(err.message);
@@ -150,9 +164,9 @@ export default function FacilityBookingPage() {
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` 
+          "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({
           purpose,
           date,
@@ -327,7 +341,16 @@ export default function FacilityBookingPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex flex-col gap-2">
                     <label className="font-['Inter'] text-xs font-bold uppercase tracking-wider text-[#434651]">Target Laboratory <span className="text-red-500">*</span></label>
-                    <select className="w-full bg-white border border-[#747782] p-3 text-sm outline-none" value={lab} onChange={(e) => setLab(e.target.value)} required style={{ borderRadius: 0 }}>
+                    <select
+                      className="w-full bg-white border border-[#747782] p-3 text-sm outline-none"
+                      value={lab}
+                      onChange={(e) => {
+                        setLab(e.target.value);
+                        setEquipment([]);
+                      }}
+                      required
+                      style={{ borderRadius: 0 }}
+                    >
                       <option value="" disabled>Select a facility...</option>
                       {availableLabs.map(l => <option key={l} value={l}>{l}</option>)}
                     </select>

@@ -20,7 +20,16 @@ export async function POST(req: NextRequest) {
 
     const accessToken = generateAccessToken(payload);
 
-    return successRes({ accessToken }, 'Token refreshed successfully.');
+    const response = successRes({ accessToken }, 'Token refreshed successfully.');
+    response.cookies.set('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60,
+      path: '/',
+    });
+
+    return response;
   } catch {
     return errorRes('Invalid or expired refresh token.', [], 401);
   }

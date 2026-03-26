@@ -15,10 +15,19 @@ export const errorRes = (message = 'Something went wrong', errors: unknown[] = [
  */
 export const authenticate = (req: NextRequest): TokenPayload | null => {
   const authHeader = req.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) return null;
-  const token = authHeader.split(' ')[1];
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    try {
+      return verifyAccessToken(token);
+    } catch {
+      return null;
+    }
+  }
+
+  const cookieToken = req.cookies.get('accessToken')?.value;
+  if (!cookieToken) return null;
   try {
-    return verifyAccessToken(token);
+    return verifyAccessToken(cookieToken);
   } catch {
     return null;
   }

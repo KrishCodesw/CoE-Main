@@ -58,6 +58,14 @@ export async function POST(req: NextRequest) {
       data: { accessToken, user: { id: user.id, name: user.name, email: user.email, role: user.role, uid: user.uid } },
     });
 
+    response.cookies.set('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60,
+      path: '/',
+    });
+
     // Set refresh token in httpOnly cookie
     response.cookies.set('refreshToken', refreshToken, {
       httpOnly: true,
